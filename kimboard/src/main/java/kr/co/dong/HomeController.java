@@ -92,6 +92,13 @@ public class HomeController {
 		
 		return "index";
 	}
+	
+	@RequestMapping(value="/index", method = RequestMethod.GET)
+	public String testindex(Model model) {
+		
+		return "index";
+	}
+	
 }
 
 
