@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.co.dong.boardMapper">
+	<!-- 로그인 처리를 위한 SQL -->
+	<select id="login" parameterType="java.util.Map"
+		resultType="java.util.Map">
+		select id, name
+		from springuser
+		where id=#{id} and password=#{password}
+	</select>
+
+	 <!-- 전체목록 -->
+	<!-- <select id="list" resultType="BoardDTO">
+		select *
+		from board
+		where del = 0
+		order by bno desc
+	</select> -->
+	<!-- 선택조회(글읽기) -->
+	<!-- 페이징 처리 된 list -->
+	<!-- 기존에 있던 list는 주석처리 -->
+
+<select id="totalRecord" resultType="java.lang.Integer">
+	select count(*) from board where del = 0
+</select>
+	
+<select id="findAll" parameterType="java.util.Map" resultType="BoardDTO">
+	SELECT *
+  FROM board
+  where del = 0
+  order by bno desc
+  LIMIT #{start}, #{pageSIZE}
+</select>
+	
+<!-- 결국 B라는 테이블에는 del=0인 게시글들만 모아 번호를 1부터 새로 AI 시킨것과 같은
+rownum 컬럼이 존재하고, 이를 이용하면 삭제되지 않은 게시글들만 다룰 수 있다. -->
+	
+	
+	<select id="detail" parameterType="java.lang.Integer"
+		resultType="BoardDTO">
+		select *
+		from board
+		where bno = #{bno}
+	</select>
+	<!-- 조회수 1 증가하는 SQL "updataReadCnt" -->
+	<update id="updateReadCnt" parameterType="java.lang.Integer">
+		update board
+		set
+		readcnt
+		= readcnt + 1
+		where bno = #{bno}
+	</update>
+	<!-- 글 추가하는 SQL "insert" or "register" -->
+	<insert id="register" parameterType="BoardDTO">
+		insert into board(bno,
+		title, content, id, regdate, readcnt, etc,del)
+		values (#{bno},
+		#{title}, #{content}, #{id}, curdate(), 0, #{etc},0)
+	</insert>
+	<!-- 글 삭제하는 SQL "delete" del 컬럼을 작성하여 1로 변경 -->
+	<update id="delete" parameterType="java.lang.Integer">
+		update board
+		set
+		del = 1
+		where bno = #{bno}
+	</update>
+	<!-- 글 수정하는 SQL "update" -->
+	<update id="update" parameterType="kr.co.dong.board.BoardDTO">
+		update board
+		set
+		title=#{title}
+		, content=#{content} , regdate=curdate( )
+		where bno = #{bno}
+	</update>
+
+	<!-- 게시글번호에 해당하는 댓글 조회하는 SQL -->
+	<select id="detail1" parameterType="java.lang.Integer"
+		resultType="BoardReply">
+		select *
+		from board_reply
+		where bno = #{bno}
+	</select>
+	<!-- 댓글쓰기 -->
+	<insert id="reply" parameterType="BoardReply">
+		insert into
+		board_reply(rewriter, rememo, redate, bno)
+		values (#{rewriter},
+		#{rememo}, curdate(), #{bno})
+	</insert>
+
+	<!-- 해당 댓글 조회 SQL -->
+	<select id="detailReply" parameterType="BoardReply"
+		resultType="BoardReply">
+		select *
+		from board_reply
+		where reno = #{reno}
+	</select>
+	<!-- 댓글수정 -->
+	<update id="replyupdate" parameterType="BoardReply">
+		update board_reply
+		set rewriter = #{rewriter}, rememo = #{rememo}, redate = curdate()
+		where reno = #{reno}
+	</update>
+
+	<delete id="replyDelete" parameterType="java.lang.Integer">
+		delete from board_reply
+		where reno = #{reno}
+	</delete>
+
+	
+	
+
+
+
+</mapper>
+  
+  
+  
+  
+  
+  
+  
+  
+  
